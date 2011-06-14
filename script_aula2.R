@@ -1,6 +1,7 @@
 ##======================================================================
 ## Script com aplicações dos conceitos da aula 2. Estimativas de pi por
 ## simulação e simulação estocástica.
+## Autor: Fernando Mayer
 ##======================================================================
 
 ##======================================================================
@@ -58,6 +59,7 @@ df <- expand.grid(Dist=Dist, theta=theta)
 # aloca os valores calculados de d da matriz
 df$d <- as.vector(mat)
 # wireframe
+require(lattice)
 wireframe(d ~ Dist + theta, data = df,
           scales = list(arrows = FALSE,
           x = list(tick.number = 5),
@@ -91,21 +93,27 @@ H[D.random <= d] <- 1
 ## h = numero de sucessos
 h <- sum(H)
 
-## \pi ~ (2ln)/(ah)
-pi <- (2*l*n)/(a*h)
+## \pi_{estimado} ~ (2ln)/(ah)
+pi.est <- (2*l*n)/(a*h)
 
+##----------------------------------------------------------------------
 ## Funcao
-buffon <- function(n, a, l){
-    D.random <- runif(n, 0, a/2)
-    theta.random <- runif(n, 0, pi)
-    d <- (l/2) * sin(theta.random)
-    H <- numeric(n)
-    H[D.random <= d] <- 1
-    h <- sum(H)
-    pi <- (2*l*n)/(a*h)
-    return(pi)
-}
+##----------------------------------------------------------------------
 
+source("buffon.R")
+
+## Testes
+seq.teste1 <- 1:1e+5                     # approx. 30 min.
 system.time(
-            buffon(10000000, 1, 1)
+            teste1 <- buffon(n = seq.teste1)
             )
+seq.teste2 <- seq(0, 1e+6, 1000)[-1]    # approx. 3 min.
+system.time(
+            teste2 <- buffon(n = seq.teste2)
+            )
+
+## Funcao para plot
+source("plot.buffon.R")
+
+plot(teste1)
+plot(teste2)
